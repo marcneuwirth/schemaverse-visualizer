@@ -47,46 +47,6 @@ var schemaverse = {
             });
         },
 
-        getPlanets: function(callback){
-            if(callback && typeof callback === 'function'){
-                var planets = schemaverse.common.planets;
-                if(planets && planets.length > 0){
-                    callback(planets);
-                }
-                else {
-
-                    d3.json("planets.json", function(data) {
-                        var planetData = data.planets;
-                        var $growl = $('.growl');
-                        var events = schemaverse.common.events;
-
-                        schemaverse.common.players.map(function(d){
-                            d.count = 0;
-                        });
-
-                        planetData.map(function(d){
-                            d.location_x = parseFloat(d.location_x, 10);
-                            d.location_y = parseFloat(d.location_y, 10);
-                            d.conqueror_id = parseInt(d.conqueror_id, 10) || null;
-                            if(schemaverse.common.players[d.conqueror_id]){
-                                d.conqueror_name = schemaverse.common.players[d.conqueror_id].conqueror_name;
-                                d.conqueror_color = schemaverse.common.players[d.conqueror_id].rgb;
-                                d.conqueror_symbol = schemaverse.common.players[d.conqueror_id].symbol;
-                                schemaverse.common.players[d.conqueror_id].count++;
-                            }
-
-                            if(d.description !== null && d.event_id && events[d.event_id] === undefined){
-                                $growl.growl_add(d.description);
-                                events[d.event_id] = true;
-                            }
-                        });
-                        schemaverse.common.planets = planetData;
-                        callback(planetData);
-                    });
-                }
-            }
-        },
-
         movePlanets: function(vis, x, y){
             planets = vis.selectAll("text.planet")
                 .transition()
@@ -212,7 +172,8 @@ var schemaverse = {
                 .attr("height", height);
 
             var $growl = $('.growl').append('<ul />').growl();
-            var events = {};
+            var tic = -1;
+            var currentTic;
 
             function getPlanets(callback){
 
@@ -234,11 +195,15 @@ var schemaverse = {
                             schemaverse.common.players[d.conqueror_id].count++;
                         }
 
-                        if(d.description !== null && d.event_id && events[d.event_id] === undefined){
-                            $growl.growl_add(d.description);
-                            events[d.event_id] = true;
+                        if(d.description !== null && d.tic !== null){
+                            currentTic = parseInt(d.tic, 10);
+                            if(currentTic > tic){
+                                $growl.growl_add(d.description);
+                            }
                         }
                     });
+
+                    tic = currentTic;
 
                     if( x === undefined && y === undefined){
 
@@ -491,7 +456,6 @@ var schemaverse = {
                     $table.selectAll('tr.player-row')
                         .on("mouseover.event", function(d){
                             var id = d3.select(this).attr('data-player-id');
-                            console.log(id);
                             d3.select('.map').classed('hover', true);
                             d3.selectAll('.map text.player-' + id).classed('hovered', true);
                         })

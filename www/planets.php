@@ -23,7 +23,8 @@ else {
 			planets.*,
 			event.id as event_id,
 			READ_EVENT(event.id) as description,
-			event.action as action
+			event.action as action,
+            event.tic as tic
 		FROM planets
 		LEFT JOIN event on (
             event.location <-> planets.location < 1000 and
