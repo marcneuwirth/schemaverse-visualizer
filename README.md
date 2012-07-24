@@ -1,0 +1,4 @@
+schemaverse-visualizer
+======================
+
+Schemaverse Visualizer
