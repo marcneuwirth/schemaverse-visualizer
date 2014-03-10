@@ -222,7 +222,7 @@ var schemaverse = {
                             .nice();
 
                         y = schemaverse.map.y = d3.scale.linear()
-                            .range([0, height])
+                            .range([height, 0])
                             .domain(extentY)
                             .clamp(true)
                             .nice();
