@@ -149,8 +149,8 @@ var schemaverse = {
         x: null,
         y: null,
         init: function(callback){
-            var width = 753;
-            var height = 753;
+            var width = 700;
+            var height = 700;
             var margin = 1;
             var extentX;
             var extentY;
@@ -284,16 +284,25 @@ var schemaverse = {
                 var y0 = y(extentY[0]);
                 var y1 = y(extentY[1]);
 
+                console.log( 'x0: ' + x0 + ' x1: ' + x1 + ' y0: ' + y0 + ' y1: ' + y1 );
+                console.log( 'x: ' + Math.abs( x1 - x0 ) + ' y: ' + Math.abs( y1 - y0 )  );
 
-
+                // $rectClosup
+                    // .style('display', 'block')
+                    // .transition()
+                    // .duration(2000)
+                        // .attr('width', 75)
+                        // .attr('height', 75)
+                        // .attr('x', x0)
+                        // .attr('y', y0);
                 $rectClosup
                     .style('display', 'block')
                     .transition()
                     .duration(4000)
-                        .attr('width', Math.abs(x1 - x0))
-                        .attr('height', Math.abs(y1 - y0))
-                        .attr('x', x0)
-                        .attr('y', y0);
+                        .attr('width', Math.abs( x1 - x0 ) )
+                        .attr('height', Math.abs( y1 - y0 ) )
+                        .attr('x', x1 )
+                        .attr('y', parseFloat( y1 - Math.abs( y1 - y0 ) ));
             }
             else {
 
@@ -305,8 +314,8 @@ var schemaverse = {
 
     closeup: {
         init: function(){
-            var width = 358;
-            var height = 358;
+            var width = 300;
+            var height = 300;
             var margin = 1;
             var extentX;
             var extentY;
@@ -355,9 +364,10 @@ var schemaverse = {
                     if(closeup.box) {
 
                         var box = closeup.box.replace(/[\(\)]/g,'').split(',');
+                        console.log( box );
                         if( box.length === 4){
-                            extentX = [box[2], box[0]];
-                            extentY = [box[3], box[1]];
+                            extentX = [box[0], box[2]];
+                            extentY = [box[1], box[3]];
 
                             vis.style('display', 'block');
 
@@ -365,7 +375,7 @@ var schemaverse = {
                                 .style('height', '90px');
 
                             x = d3.scale.linear()
-                                .range([0, width])
+                                .range([width, 0])
                                 .domain(extentX)
                                 .clamp(false)
                                 .nice();
