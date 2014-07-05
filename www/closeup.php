@@ -20,14 +20,29 @@ else {
 
     @$attack_event = pg_query($conn, "SELECT location,
             tic,
-            BOX(CIRCLE(location,1000000)) as box,
+            BOX(CIRCLE(location,(
+                select ( m * ceil( v / m ) ) / 10 from (
+                    select 10 ^ floor(log(
+                        greatest(max(abs(location_x)),max(abs(location_y)))
+                    ) ) m,
+                    greatest(max(abs(location_x)),max(abs(location_y))) v
+                    from planets
+                )a
+            ))) as box,
             (
                 SELECT count(1)
                 FROM my_events AS count_events
-                WHERE action IN ('CONQUER') AND
+                WHERE action = upper('conquer') AND
                     tic = (SELECT last_value - 1 FROM tic_seq) AND
-                    count_events.location <-> my_events.location < 1000000
-
+                    count_events.location <-> my_events.location < (
+                            select m * ceil( v / m ) from (
+                                select 10 ^ floor(log(
+                                    greatest(max(abs(location_x)),max(abs(location_y)))
+                                ) ) m,
+                                greatest(max(abs(location_x)),max(abs(location_y))) v
+                                from planets
+                            )a
+                    )
             )  AS count
         FROM my_events
         WHERE action in ('CONQUER') AND
