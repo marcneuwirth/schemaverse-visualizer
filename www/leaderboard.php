@@ -19,7 +19,33 @@ else {
         exit;
     }
 
-    @$result = pg_query($conn, "SELECT * FROM leader_board");
+    @$result = pg_query($conn, "
+        select id, stats.username, (
+            100000 + 10000
+            + fuel_mined - ship_upgrades
+            - ( ships_built * ( select cost from price_list where code = upper('ship') ) )
+        ) networth,
+        ships_built - ships_lost ships,
+        planets_conquered - planets_lost planets,
+        symbol, rgb
+        from current_player_stats stats
+        join player_list on stats.player_id = id
+        where 1=1
+        and fuel_mined > 0
+        and ships_built > 0
+        and planets_conquered >= -1
+        order by
+            planets_conquered - planets_lost desc,
+            ships_built - ships_lost desc,
+            (
+                100000 + 10000
+                + fuel_mined - ship_upgrades
+                - ( ships_built * ( select cost from price_list where code = upper('ship') ) )
+            ) desc
+        limit 10
+        ;
+
+    ");
     if (!$result) {
         echo json_encode(array('leader_board' => array()));
         exit;
